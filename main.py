@@ -4,27 +4,32 @@
 # @Email   : johnhuan@whu.edu.cn
 # QQ       : 248404941
 # @File    : main.py
-import datetime
-import ppgnss.gnss_time
+
 from docx import Document
+from datetime import datetime as dt, timedelta
+from datetime import date as dt_date
+from zhdate import datetime as zh_dt
+from zhdate import ZhDate as zh_date
 
 
 def generate_school_calendar(year, month, day, week_list):
-    yr, doy_start = ppgnss.gnss_time.ymd2doy(year, month, day)  # 第一周开始的时间
     for i in range(0, 20):
         week_name = "第%d周" % (i + 1)
         document.add_heading(week_name, 2)
-        # table = document.add_table(rows=3, cols=7, style='Table Grid')
-        table = document.add_table(rows=3, cols=7, style='Colorful List')
+        table = document.add_table(rows=4, cols=7, style='Colorful List')
         for j in range(0, 7):
-            doy = doy_start + i * 7 + j
-            yr, mo, dy = ppgnss.gnss_time.doy2ymd(year, doy)
-            week_day = week_list[datetime.date(yr, mo, int(dy)).isoweekday() - 1]
+            days = i * 7 + j
+            date = dt_date(year, month, day) + timedelta(days=days)
+            week_day = week_list[date.isoweekday() - 1]
             hdr_cells_mo_dy = table.rows[0].cells
-            hdr_cells_mo_dy[j].text = "%d月%d" % (mo, dy)
-            hdr_cells_week_dy = table.rows[1].cells
+            hdr_cells_mo_dy[j].text = "%d月%d" % (date.month, date.day)
+            hdr_cells_zh_dy = table.rows[1].cells
+            zh_date.from_datetime(dt(year, month, day))
+            zh_d = zh_date.from_datetime(dt(date.year, date.month, date.day)).chinese()[5:-8]
+            hdr_cells_zh_dy[j].text = zh_d
+            hdr_cells_week_dy = table.rows[2].cells
             hdr_cells_week_dy[j].text = week_day
-            hdr_cells_work = table.rows[2].cells
+            hdr_cells_work = table.rows[3].cells
             hdr_cells_work[j].text = ""
 
 
